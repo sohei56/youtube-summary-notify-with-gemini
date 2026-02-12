@@ -1,13 +1,12 @@
 # YouTube Summary Notify
 
-Automatically detects new videos from specified YouTube channels, generates summaries using Gemini AI, and sends notifications to Slack.
+Automatically detects new videos from specified YouTube channels, generates summaries using Gemini AI, and sends notifications to configured destinations (Slack, and more planned).
 
 ## How It Works
 
 1. **Detect** new videos from monitored YouTube channels (YouTube Data API v3)
 2. **Summarize** each video using Gemini AI (processes video natively — no transcript extraction needed)
-3. **Notify** all configured Slack channels with formatted summaries
-4. **Track** notified videos in DynamoDB to prevent duplicates
+3. **Notify** all configured destinations with formatted summaries (currently Slack; pluggable for future platforms)
 
 The system runs as a scheduled AWS Lambda function. All user-editable settings (channels, prompts, templates, model) live in a single S3 config file — no redeployment needed for configuration changes.
 
@@ -22,8 +21,8 @@ EventBridge (cron) ──▶ Lambda (Docker)
                           │
                ┌──────────┼──────────┐
                ▼          ▼          ▼
-          YouTube     Gemini API   Slack
-          Data API                 Webhook
+          YouTube     Gemini API   Notification
+          Data API                 Webhooks
 ```
 
 For detailed architecture and design decisions, see [docs/01_design/](docs/01_design/).
@@ -34,7 +33,7 @@ For detailed architecture and design decisions, see [docs/01_design/](docs/01_de
 
 - AWS CLI and SAM CLI installed
 - Docker installed
-- API keys for Gemini, YouTube Data API v3, and a Slack Incoming Webhook URL
+- API keys for Gemini, YouTube Data API v3, and a webhook URL for your notification platform (e.g., Slack)
 
 For step-by-step API key acquisition and full deployment instructions, see [docs/02_operation/00_deployment.md](docs/02_operation/00_deployment.md).
 

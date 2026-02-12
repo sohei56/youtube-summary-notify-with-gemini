@@ -17,11 +17,11 @@
                          │
               ┌──────────┼──────────┐
               ▼          ▼          ▼
-         YouTube     Gemini API   Slack
-         Data API                 Webhook
+         YouTube     Gemini API   Notification
+         Data API                 Webhooks
 ```
 
-The system runs as a single Lambda function triggered on a schedule. It reads configuration from S3, detects new videos via YouTube Data API, summarizes them via Gemini API, and sends notifications via Slack Incoming Webhooks.
+The system runs as a single Lambda function triggered on a schedule. It reads configuration from S3, detects new videos via YouTube Data API, summarizes them via Gemini API, and sends notifications via configured webhooks (currently Slack; pluggable for future platforms).
 
 ## AWS Resource Summary
 
@@ -41,7 +41,7 @@ All resources are provisioned by the SAM template (`infra/template.yaml`). All r
 |---|---|---|
 | YouTube Data API v3 | Read | Fetch recent videos from monitored channels |
 | Gemini API | Read | Generate video summaries from YouTube URLs |
-| Slack Incoming Webhooks | Write | Send summary and error notifications |
+| Notification Webhooks (e.g., Slack) | Write | Send summary and error notifications |
 
 ## Data Schemas
 

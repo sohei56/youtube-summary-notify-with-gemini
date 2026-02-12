@@ -11,7 +11,7 @@
 Core dependencies:
 
 - `google-genai` — Gemini API SDK
-- `httpx` — async HTTP client (YouTube API, Slack Webhooks)
+- `httpx` — async HTTP client (YouTube API, notification webhooks)
 - `boto3` — AWS SDK (S3, DynamoDB, Secrets Manager)
 - `pyyaml` — config.yaml parsing
 
@@ -54,7 +54,7 @@ All versions pinned in `pyproject.toml`. Minimize third-party dependencies.
 - Unit tests: `tests/unit/test_<module>.py`
 - E2E tests: `tests/e2e/test_e2e.py` (full pipeline with moto AWS + httpx.MockTransport)
 - Use fixtures for shared setup (S3, DynamoDB mocks via `moto`)
-- Mock external APIs (YouTube, Gemini, Slack) — no real API calls in tests
+- Mock external APIs (YouTube, Gemini, notification webhooks) — no real API calls in tests
 
 ## Containerization
 
