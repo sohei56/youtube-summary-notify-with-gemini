@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: YouTube Summary Notify - Detect new YouTube videos, summarize with Gemini AI, and notify via webhooks
+
+Parameters:
+  ExecutionInterval:
+    Type: Number
+    Default: 60
+    Description: Execution interval in minutes
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-function"
+      PackageType: Image
+      MemorySize: 256
+      Timeout: 900
+      Environment:
+        Variables:
+          CONFIG_BUCKET: !Ref ConfigBucket
+          STATE_TABLE: !Ref VideoStateTable
+          SECRETS_ARN: !Ref Secrets
+          DEPLOYMENT_ID: !Sub "${AWS::StackName}"
+          EXECUTION_INTERVAL_MINUTES: !Ref ExecutionInterval
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref ConfigBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref VideoStateTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: !Ref Secrets
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Name: !Sub "${AWS::StackName}-schedule"
+            Schedule: !Sub "rate(${ExecutionInterval} minutes)"
+            Enabled: true
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ..
+      DockerTag: latest
+
+  ConfigBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-config-${AWS::AccountId}"
+
+  VideoStateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-video-state"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: deployment_id
+          AttributeType: S
+        - AttributeName: video_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: deployment_id
+          KeyType: HASH
+        - AttributeName: video_id
+          KeyType: RANGE
+
+  Secrets:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "${AWS::StackName}-secrets"
+      Description: API keys and webhook URLs for YouTube Summary Notify
+      SecretString: "{}"
+
+Outputs:
+  FunctionName:
+    Description: Lambda function name
+    Value: !Ref Function
+  ConfigBucketName:
+    Description: S3 bucket name for config.yaml upload
+    Value: !Ref ConfigBucket
+  SecretsArn:
+    Description: Secrets Manager secret ARN
+    Value: !Ref Secrets

@@ -51,7 +51,8 @@ All versions pinned in `pyproject.toml`. Minimize third-party dependencies.
 ## Testing
 
 - Framework: pytest + pytest-asyncio
-- Test files: `tests/test_<module>.py`
+- Unit tests: `tests/unit/test_<module>.py`
+- E2E tests: `tests/e2e/test_e2e.py` (full pipeline with moto AWS + httpx.MockTransport)
 - Use fixtures for shared setup (S3, DynamoDB mocks via `moto`)
 - Mock external APIs (YouTube, Gemini, Slack) — no real API calls in tests
 

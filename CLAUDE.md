@@ -65,6 +65,9 @@ youtube-summary-notify-with-gemini/
 ├── infra/
 │   └── template.yaml              # SAM template
 ├── tests/
+│   ├── conftest.py                # Shared fixtures (moto AWS, constants)
+│   ├── unit/                      # Unit tests (one file per module)
+│   └── e2e/                       # E2E tests (full pipeline)
 ├── Dockerfile
 ├── pyproject.toml
 ├── README.md
