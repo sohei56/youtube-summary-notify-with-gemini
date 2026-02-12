@@ -90,9 +90,9 @@ ruff format .
 | [Data Design](docs/01_design/02_data-design.md) | config.yaml schema, DynamoDB schema, Secrets Manager format |
 | [Coding Standards](docs/01_design/03_coding-standards.md) | Language conventions, dependencies, formatting, testing |
 | [Deployment](docs/02_operation/00_deployment.md) | Deployment, configuration, troubleshooting, cleanup |
-| [YouTube Data API](docs/03_specs_of_related_systems/00_youtube-data-api.md) | YouTube Data API v3 reference |
-| [Gemini API](docs/03_specs_of_related_systems/01_gemini-api.md) | Gemini API reference |
-| [Notification Platforms](docs/03_specs_of_related_systems/02_notification-platform.md) | Slack (and future Discord) webhook specs |
+| [YouTube Data API](docs/03_external_apis/00_youtube-data-api.md) | YouTube Data API v3 reference |
+| [Gemini API](docs/03_external_apis/01_gemini-api.md) | Gemini API reference |
+| [Notification Webhook API](docs/03_external_apis/02_notification-webhook-api.md) | Slack (and future Discord) webhook specs |
 
 ## License
 

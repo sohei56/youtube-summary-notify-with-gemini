@@ -16,7 +16,7 @@
 - **Prompt template**: stored in S3 config file (`config.yaml`). The system only substitutes the video URL into the template at runtime. Users can edit the prompt freely by updating the S3 file — no SAM redeployment required.
 - **Summary language**: managed within the same S3 config file (default: `en`).
 - **Gemini model**: managed within the same S3 config file (default: `gemini-2.5-flash`). Users can change the model without redeployment.
-- See `docs/03_specs_of_related_systems/01_gemini-api.md` for model recommendations.
+- See `docs/03_external_apis/01_gemini-api.md` for model recommendations.
 
 ### F-3: Notification
 

@@ -1,4 +1,4 @@
-# Notification Platforms
+# Notification Webhook API
 
 ## Slack Incoming Webhooks (v1)
 

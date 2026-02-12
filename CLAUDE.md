@@ -43,10 +43,10 @@ youtube-summary-notify-with-gemini/
 │   │   └── 03_coding-standards.md
 │   ├── 02_operation/
 │   │   └── 00_deployment.md
-│   └── 03_specs_of_related_systems/
+│   └── 03_external_apis/
 │       ├── 00_youtube-data-api.md
 │       ├── 01_gemini-api.md
-│       └── 02_notification-platform.md
+│       └── 02_notification-webhook-api.md
 ├── youtube_summary_notify/
 │   ├── __init__.py
 │   ├── main.py                    # Core orchestration logic
@@ -84,6 +84,6 @@ The following documents contain detailed specs, design decisions, and constraint
 4. [docs/01_design/02_data-design.md](docs/01_design/02_data-design.md) — Data schemas: config.yaml, DynamoDB, Secrets Manager
 5. [docs/01_design/03_coding-standards.md](docs/01_design/03_coding-standards.md) — Language, dependencies, formatting, testing
 6. [docs/02_operation/00_deployment.md](docs/02_operation/00_deployment.md) — Deployment, configuration, troubleshooting, cleanup
-7. [docs/03_specs_of_related_systems/00_youtube-data-api.md](docs/03_specs_of_related_systems/00_youtube-data-api.md) — YouTube Data API v3
-8. [docs/03_specs_of_related_systems/01_gemini-api.md](docs/03_specs_of_related_systems/01_gemini-api.md) — Gemini API
-9. [docs/03_specs_of_related_systems/02_notification-platform.md](docs/03_specs_of_related_systems/02_notification-platform.md) — Notification platforms (Slack, Discord)
+7. [docs/03_external_apis/00_youtube-data-api.md](docs/03_external_apis/00_youtube-data-api.md) — YouTube Data API v3
+8. [docs/03_external_apis/01_gemini-api.md](docs/03_external_apis/01_gemini-api.md) — Gemini API
+9. [docs/03_external_apis/02_notification-webhook-api.md](docs/03_external_apis/02_notification-webhook-api.md) — Notification webhook API (Slack, Discord)
