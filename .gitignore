@@ -209,6 +209,9 @@ __marimo__/
 # AWS SAM build artifacts
 .aws-sam/
 
+# Lambda invoke output
+response.json
+
 # User config (contains API key references and personal channel settings)
 config.yaml
 
