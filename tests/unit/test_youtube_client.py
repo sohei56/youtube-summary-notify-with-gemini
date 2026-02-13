@@ -52,14 +52,17 @@ def _mock_transport(response_data: dict, status_code: int = 200) -> httpx.MockTr
 
 class TestChannelToPlaylistId:
     def test_converts_uc_to_uu(self):
+        """Converts 'UC' channel prefix to 'UU' uploads playlist prefix."""
         assert YouTubeClient._channel_to_playlist_id("UCxxxxxxxxxxxxxxxxxxxxxx") == "UUxxxxxxxxxxxxxxxxxxxxxx"
 
     def test_preserves_remaining_chars(self):
+        """Only the first two characters change; the rest stay the same."""
         assert YouTubeClient._channel_to_playlist_id("UCabcdefghijklmnopqrstuv") == "UUabcdefghijklmnopqrstuv"
 
 
 class TestFetchRecentVideosHappyPath:
     async def test_returns_videos_within_lookback(self):
+        """Returns videos published within the lookback window."""
         recent = _recent_timestamp(30)
         items = [_make_item("vid_1", "Recent Video", recent)]
         transport = _mock_transport(_make_playlist_response(items))
@@ -75,6 +78,7 @@ class TestFetchRecentVideosHappyPath:
         assert videos[0].published_at == recent
 
     async def test_filters_out_old_videos(self):
+        """Excludes videos published before the lookback window."""
         recent = _recent_timestamp(30)
         old = _old_timestamp(300)
         items = [
@@ -90,6 +94,7 @@ class TestFetchRecentVideosHappyPath:
         assert videos[0].video_id == "vid_recent"
 
     async def test_returns_empty_list_when_no_recent_videos(self):
+        """Returns empty list when all videos are outside the lookback window."""
         old = _old_timestamp(300)
         items = [_make_item("vid_old", "Old", old)]
         transport = _mock_transport(_make_playlist_response(items))
@@ -100,6 +105,7 @@ class TestFetchRecentVideosHappyPath:
         assert videos == []
 
     async def test_returns_empty_list_for_empty_response(self):
+        """Returns empty list when the API returns no items."""
         transport = _mock_transport(_make_playlist_response([]))
         async with httpx.AsyncClient(transport=transport) as client:
             yt = YouTubeClient(api_key=API_KEY, http_client=client)
@@ -108,6 +114,7 @@ class TestFetchRecentVideosHappyPath:
         assert videos == []
 
     async def test_multiple_videos_all_recent(self):
+        """Returns all videos when all are within the lookback window."""
         items = [
             _make_item("vid_1", "Video 1", _recent_timestamp(10)),
             _make_item("vid_2", "Video 2", _recent_timestamp(20)),
@@ -124,6 +131,7 @@ class TestFetchRecentVideosHappyPath:
 
 class TestFetchRecentVideosEdgeCases:
     async def test_skips_item_with_missing_published_at(self):
+        """Skips items missing the publishedAt field."""
         items = [{"snippet": {"title": "No Date", "resourceId": {"videoId": "vid_nodate"}}}]
         transport = _mock_transport(_make_playlist_response(items))
         async with httpx.AsyncClient(transport=transport) as client:
@@ -133,6 +141,7 @@ class TestFetchRecentVideosEdgeCases:
         assert videos == []
 
     async def test_skips_item_with_missing_video_id(self):
+        """Skips items missing the videoId in resourceId."""
         recent = _recent_timestamp(30)
         items = [{"snippet": {"publishedAt": recent, "title": "No ID", "resourceId": {}}}]
         transport = _mock_transport(_make_playlist_response(items))
@@ -143,6 +152,7 @@ class TestFetchRecentVideosEdgeCases:
         assert videos == []
 
     async def test_skips_item_with_invalid_date_format(self):
+        """Skips items with unparseable date strings."""
         items = [_make_item("vid_bad_date", "Bad Date", "not-a-date")]
         transport = _mock_transport(_make_playlist_response(items))
         async with httpx.AsyncClient(transport=transport) as client:
@@ -154,6 +164,7 @@ class TestFetchRecentVideosEdgeCases:
 
 class TestFetchRecentVideosAPIErrors:
     async def test_http_403_raises_youtube_client_error(self):
+        """Wraps HTTP 403 responses as YouTubeClientError."""
         transport = _mock_transport({"error": {"message": "Forbidden"}}, status_code=403)
         async with httpx.AsyncClient(transport=transport) as client:
             yt = YouTubeClient(api_key=API_KEY, http_client=client)
@@ -161,6 +172,7 @@ class TestFetchRecentVideosAPIErrors:
                 await yt.fetch_recent_videos(CHANNEL_ID, CHANNEL_NAME, LOOKBACK_MINUTES)
 
     async def test_http_404_raises_youtube_client_error(self):
+        """Wraps HTTP 404 responses as YouTubeClientError."""
         transport = _mock_transport({"error": {"message": "Not Found"}}, status_code=404)
         async with httpx.AsyncClient(transport=transport) as client:
             yt = YouTubeClient(api_key=API_KEY, http_client=client)
@@ -168,6 +180,7 @@ class TestFetchRecentVideosAPIErrors:
                 await yt.fetch_recent_videos(CHANNEL_ID, CHANNEL_NAME, LOOKBACK_MINUTES)
 
     async def test_network_error_raises_youtube_client_error(self):
+        """Wraps network-level failures as YouTubeClientError."""
         def raise_error(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("Connection refused")
 

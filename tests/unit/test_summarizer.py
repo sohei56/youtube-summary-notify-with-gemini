@@ -35,6 +35,7 @@ def _make_summarizer(client: MagicMock | None = None) -> Summarizer:
 
 class TestSummarizeHappyPath:
     async def test_returns_summary_result(self):
+        """Returns a SummaryResult with all video metadata and generated summary."""
         mock_client = _make_mock_client("A great summary of the video.")
         summarizer = _make_summarizer(mock_client)
 
@@ -57,6 +58,7 @@ class TestSummarizeHappyPath:
         assert result.summary == "A great summary of the video."
 
     async def test_substitutes_prompt_template(self):
+        """Replaces {language} and {video_url} in the prompt before sending to Gemini."""
         mock_client = _make_mock_client("Summary text.")
         summarizer = _make_summarizer(mock_client)
 
@@ -76,6 +78,7 @@ class TestSummarizeHappyPath:
         )
 
     async def test_uses_configured_model(self):
+        """Passes the configured model name to the Gemini client."""
         mock_client = _make_mock_client("Summary.")
         summarizer = Summarizer(api_key=API_KEY, model="gemini-2.0-flash", client=mock_client)
 
@@ -97,6 +100,7 @@ class TestSummarizeHappyPath:
 
 class TestSummarizeEmptyResponse:
     async def test_empty_text_raises_error(self):
+        """Raises SummarizerError when Gemini returns an empty string."""
         mock_client = _make_mock_client(response_text="")
         summarizer = _make_summarizer(mock_client)
 
@@ -112,6 +116,7 @@ class TestSummarizeEmptyResponse:
             )
 
     async def test_none_text_raises_error(self):
+        """Raises SummarizerError when Gemini returns None."""
         mock_client = _make_mock_client(response_text=None)
         summarizer = _make_summarizer(mock_client)
 
@@ -129,6 +134,7 @@ class TestSummarizeEmptyResponse:
 
 class TestSummarizeAPIErrors:
     async def test_client_error_raises_summarizer_error(self):
+        """Wraps Gemini client errors (e.g. 429 rate limit) as SummarizerError."""
         mock_client = _make_mock_client()
         mock_client.aio.models.generate_content = AsyncMock(
             side_effect=genai_errors.ClientError(429, {"error": {"message": "Rate limited", "status": "RATE_LIMITED"}})
@@ -147,6 +153,7 @@ class TestSummarizeAPIErrors:
             )
 
     async def test_server_error_raises_summarizer_error(self):
+        """Wraps Gemini server errors (e.g. 500) as SummarizerError."""
         mock_client = _make_mock_client()
         mock_client.aio.models.generate_content = AsyncMock(
             side_effect=genai_errors.ServerError(500, {"error": {"message": "Internal error", "status": "INTERNAL"}})
@@ -165,6 +172,7 @@ class TestSummarizeAPIErrors:
             )
 
     async def test_api_error_raises_summarizer_error(self):
+        """Wraps generic Gemini API errors as SummarizerError."""
         mock_client = _make_mock_client()
         mock_client.aio.models.generate_content = AsyncMock(
             side_effect=genai_errors.APIError(403, {"error": {"message": "Forbidden", "status": "FORBIDDEN"}})
@@ -183,6 +191,7 @@ class TestSummarizeAPIErrors:
             )
 
     async def test_unexpected_exception_raises_summarizer_error(self):
+        """Wraps unexpected exceptions as SummarizerError."""
         mock_client = _make_mock_client()
         mock_client.aio.models.generate_content = AsyncMock(side_effect=RuntimeError("Something broke"))
         summarizer = _make_summarizer(mock_client)
@@ -201,6 +210,7 @@ class TestSummarizeAPIErrors:
 
 class TestSummarizeErrorMessages:
     async def test_error_includes_video_title_and_id(self):
+        """Error message includes the video title and ID for debugging."""
         mock_client = _make_mock_client()
         mock_client.aio.models.generate_content = AsyncMock(side_effect=RuntimeError("fail"))
         summarizer = _make_summarizer(mock_client)

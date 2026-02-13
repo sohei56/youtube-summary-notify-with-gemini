@@ -36,10 +36,12 @@ def _mock_transport(status_code: int = 200, body: str = "ok") -> httpx.MockTrans
 
 class TestBaseNotifierInterface:
     def test_cannot_instantiate_directly(self):
+        """BaseNotifier is abstract and cannot be instantiated."""
         with pytest.raises(TypeError):
             BaseNotifier(name="test", webhook_url="http://x", message_template="{summary}")
 
     def test_name_property(self):
+        """Exposes the notifier name passed at construction."""
         class ConcreteNotifier(BaseNotifier):
             async def send_summary(self, video: VideoInfo) -> bool:
                 return True
@@ -51,6 +53,7 @@ class TestBaseNotifierInterface:
         assert notifier.name == "my-target"
 
     def test_format_message_substitutes_all_fields(self):
+        """Substitutes all template variables in the message."""
         class ConcreteNotifier(BaseNotifier):
             async def send_summary(self, video: VideoInfo) -> bool:
                 return True
@@ -70,6 +73,7 @@ class TestBaseNotifierInterface:
 
 class TestSlackSendSummary:
     async def test_success_returns_true(self):
+        """Returns True on successful webhook delivery."""
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
@@ -80,6 +84,7 @@ class TestSlackSendSummary:
         assert result is True
 
     async def test_posts_formatted_message(self):
+        """Sends the formatted message in the JSON payload."""
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
@@ -95,6 +100,7 @@ class TestSlackSendSummary:
         assert "This is a great summary of the video." in body["text"]
 
     async def test_posts_to_webhook_url(self):
+        """Posts to the configured webhook URL."""
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
@@ -106,6 +112,7 @@ class TestSlackSendSummary:
         assert str(req.url) == WEBHOOK_URL
 
     async def test_http_error_returns_false(self):
+        """Returns False on HTTP 500 response."""
         transport = _mock_transport(500, "internal error")
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
@@ -116,6 +123,7 @@ class TestSlackSendSummary:
         assert result is False
 
     async def test_network_error_returns_false(self):
+        """Returns False on network connection failure."""
         def raise_error(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("Connection refused")
 
@@ -131,6 +139,7 @@ class TestSlackSendSummary:
 
 class TestSlackSendError:
     async def test_success_returns_true(self):
+        """Returns True on successful error notification delivery."""
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
@@ -141,6 +150,7 @@ class TestSlackSendError:
         assert result is True
 
     async def test_posts_error_message_directly(self):
+        """Sends the error string directly as message text, bypassing the template."""
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
@@ -153,6 +163,7 @@ class TestSlackSendError:
         assert body["text"] == "3 videos failed summarization"
 
     async def test_http_error_returns_false(self):
+        """Returns False on HTTP 403 response."""
         transport = _mock_transport(403, "forbidden")
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
@@ -163,6 +174,7 @@ class TestSlackSendError:
         assert result is False
 
     async def test_network_error_returns_false(self):
+        """Returns False on network connection failure."""
         def raise_error(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("Connection refused")
 
@@ -178,6 +190,7 @@ class TestSlackSendError:
 
 class TestSlackMessageFormat:
     async def test_all_template_variables_substituted(self):
+        """All five template variables are substituted in the sent message."""
         template = "{channel} | {title} | {url} | {published_at} | {summary}"
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
@@ -192,6 +205,7 @@ class TestSlackMessageFormat:
         assert body["text"] == expected
 
     async def test_json_content_type(self):
+        """Request uses application/json content type."""
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(

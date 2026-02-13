@@ -14,10 +14,12 @@ def store(dynamodb_table):
 
 class TestGetNotifiedIds:
     async def test_empty_table_returns_empty_set(self, store):
+        """Returns empty set when no videos have been notified."""
         result = await store.get_notified_ids()
         assert result == set()
 
     async def test_returns_written_ids(self, store):
+        """Returns all previously stored video IDs."""
         await store.put_notified_ids(["vid_1", "vid_2", "vid_3"])
         result = await store.get_notified_ids()
         assert result == {"vid_1", "vid_2", "vid_3"}
@@ -25,17 +27,20 @@ class TestGetNotifiedIds:
 
 class TestPutNotifiedIds:
     async def test_empty_list_is_noop(self, store):
+        """Writing an empty list does not create any records."""
         await store.put_notified_ids([])
         result = await store.get_notified_ids()
         assert result == set()
 
     async def test_multiple_puts_accumulate(self, store):
+        """Successive writes accumulate video IDs."""
         await store.put_notified_ids(["vid_1", "vid_2"])
         await store.put_notified_ids(["vid_3", "vid_4"])
         result = await store.get_notified_ids()
         assert result == {"vid_1", "vid_2", "vid_3", "vid_4"}
 
     async def test_duplicate_ids_handled(self, store):
+        """Re-writing an existing ID does not create duplicates."""
         await store.put_notified_ids(["vid_1", "vid_2"])
         await store.put_notified_ids(["vid_2", "vid_3"])
         result = await store.get_notified_ids()
@@ -44,6 +49,7 @@ class TestPutNotifiedIds:
 
 class TestEntryLimit:
     async def test_enforces_500_entry_limit(self, store):
+        """Deletes the oldest entries when count exceeds 500."""
         # Write 510 entries in batches
         all_ids = [f"vid_{i:04d}" for i in range(510)]
 

@@ -107,12 +107,14 @@ def _make_mock_loader(app_config: ApplicationConfig | None = None) -> MagicMock:
 
 class TestBuildNotifiers:
     def test_creates_slack_notifier(self):
+        """Creates a single Slack notifier from config."""
         app_config = _make_app_config()
         notifiers = _build_notifiers(app_config)
         assert len(notifiers) == 1
         assert notifiers[0].name == "team-slack"
 
     def test_creates_multiple_notifiers(self):
+        """Creates one notifier per notification target in config."""
         config = _make_config(
             notifications=[
                 Notification(
@@ -135,6 +137,7 @@ class TestBuildNotifiers:
 
 class TestDetectNewVideos:
     async def test_returns_new_videos_only(self):
+        """Filters out already-notified videos using DynamoDB state."""
         yt_client = MagicMock()
         yt_client.fetch_recent_videos = AsyncMock(
             return_value=[_make_video("vid_1"), _make_video("vid_2"), _make_video("vid_3")]
@@ -149,6 +152,7 @@ class TestDetectNewVideos:
         assert {v.video_id for v in videos} == {"vid_2", "vid_3"}
 
     async def test_returns_empty_when_all_notified(self):
+        """Returns empty when all recent videos were already notified."""
         yt_client = MagicMock()
         yt_client.fetch_recent_videos = AsyncMock(return_value=[_make_video("vid_1")])
         state_store = MagicMock()
@@ -159,6 +163,7 @@ class TestDetectNewVideos:
         assert videos == []
 
     async def test_returns_empty_when_no_recent_videos(self):
+        """Returns empty when no recent videos exist across all channels."""
         yt_client = MagicMock()
         yt_client.fetch_recent_videos = AsyncMock(return_value=[])
         state_store = MagicMock()
@@ -194,6 +199,7 @@ class TestDetectNewVideos:
         assert videos[0].video_id == "vid_1"
 
     async def test_fetches_all_channels_concurrently(self):
+        """Calls fetch_recent_videos once per configured channel."""
         config = _make_config(
             channels=[
                 Channel(id="UCaaaaaaaaaaaaaaaaaaaaa1", name="Ch1"),
@@ -213,6 +219,7 @@ class TestDetectNewVideos:
 
 class TestSummarizeVideos:
     async def test_all_succeed(self):
+        """Returns all summaries with no failures when every video succeeds."""
         summarizer = MagicMock()
         summarizer.summarize = AsyncMock(side_effect=[_make_summary_result("v1"), _make_summary_result("v2")])
 
@@ -224,6 +231,7 @@ class TestSummarizeVideos:
         assert len(failures) == 0
 
     async def test_partial_failure(self):
+        """Separates successful summaries from failed ones."""
         summarizer = MagicMock()
         summarizer.summarize = AsyncMock(
             side_effect=[
@@ -243,6 +251,7 @@ class TestSummarizeVideos:
         assert "Gemini error" in failures[0].error
 
     async def test_all_fail(self):
+        """Returns all videos as failures when every summarization fails."""
         summarizer = MagicMock()
         summarizer.summarize = AsyncMock(side_effect=SummarizerError("fail"))
 
@@ -254,6 +263,7 @@ class TestSummarizeVideos:
         assert len(failures) == 2
 
     async def test_passes_prompt_and_language(self):
+        """Forwards prompt_template and language from config to the summarizer."""
         summarizer = MagicMock()
         summarizer.summarize = AsyncMock(return_value=_make_summary_result("v1"))
 
@@ -268,6 +278,7 @@ class TestSummarizeVideos:
 
 class TestBuildErrorMessage:
     def test_includes_counts(self):
+        """Error message includes success and failure counts."""
         successes = [_make_summary_result("v1")]
         failures = [FailedVideo(title="Bad Video", url="https://yt/bad", error="API error")]
         msg = _build_error_message(successes, failures)
@@ -275,6 +286,7 @@ class TestBuildErrorMessage:
         assert "1 failed" in msg
 
     def test_includes_failed_video_details(self):
+        """Error message includes each failed video's title, URL, and error."""
         failures = [
             FailedVideo(title="Video A", url="https://yt/a", error="Rate limited"),
             FailedVideo(title="Video B", url="https://yt/b", error="Timeout"),
@@ -289,7 +301,7 @@ class TestBuildErrorMessage:
 
 class TestRunFullPipeline:
     async def test_happy_path_end_to_end(self):
-        """Full pipeline: 1 new video → summarized → notified → state updated."""
+        """Full pipeline: 1 new video -> summarized -> notified -> state updated."""
         app_config = _make_app_config()
         loader = _make_mock_loader(app_config)
         notifier = MagicMock()
@@ -329,6 +341,7 @@ class TestRunFullPipeline:
         notifier.send_error.assert_not_called()
 
     async def test_no_new_videos_skips_remaining_steps(self):
+        """Skips summarization and state update when no new videos found."""
         app_config = _make_app_config()
         loader = _make_mock_loader(app_config)
 
@@ -352,6 +365,7 @@ class TestRunFullPipeline:
         state_instance.put_notified_ids.assert_not_called()
 
     async def test_config_error_aborts(self):
+        """Aborts the entire pipeline on configuration errors."""
         loader = MagicMock()
         loader.load = AsyncMock(side_effect=ConfigError("bad config"))
 
@@ -366,7 +380,7 @@ class TestRunFullPipeline:
         MockSummarizer.assert_not_called()
 
     async def test_partial_summarization_failure_sends_error_and_updates_state(self):
-        """Some videos fail summarization → error notification sent, only successes written to state."""
+        """Partial failure: error notification sent, only successes written to state."""
         app_config = _make_app_config()
         loader = _make_mock_loader(app_config)
         notifier = MagicMock()
@@ -413,7 +427,7 @@ class TestRunFullPipeline:
         state_instance.put_notified_ids.assert_called_once_with(["vid_ok"])
 
     async def test_all_summarization_fails_no_state_update(self):
-        """All videos fail → error notification sent, state NOT updated."""
+        """All videos fail: error notification sent, state NOT updated."""
         app_config = _make_app_config()
         loader = _make_mock_loader(app_config)
         notifier = MagicMock()
@@ -441,7 +455,7 @@ class TestRunFullPipeline:
         state_instance.put_notified_ids.assert_not_called()
 
     async def test_multiple_notifiers_all_receive_messages(self):
-        """All notification targets receive summaries and error messages."""
+        """All notification targets receive summary messages."""
         app_config = _make_app_config()
         loader = _make_mock_loader(app_config)
 
@@ -503,6 +517,7 @@ class TestRunFullPipeline:
 
 class TestHandler:
     def test_handler_returns_200(self):
+        """Lambda handler returns statusCode 200 and calls run()."""
         with patch("youtube_summary_notify.main.run", new_callable=AsyncMock) as mock_run:
             from youtube_summary_notify.main import handler
 

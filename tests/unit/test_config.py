@@ -30,6 +30,7 @@ def env_vars():
 
 class TestHappyPath:
     async def test_load_returns_application_config(self, all_aws, env_vars):
+        """Loads all config sections into a unified ApplicationConfig."""
         loader = ConfigLoader()
         app_config = await loader.load()
 
@@ -42,47 +43,56 @@ class TestHappyPath:
         assert app_config.user_config.summarization.model == "gemini-2.5-flash"
 
     async def test_lookback_window_is_double_interval(self, all_aws, env_vars):
+        """Lookback window defaults to 2x the execution interval."""
         loader = ConfigLoader()
         app_config = await loader.load()
         assert app_config.lookback_window_minutes == 120.0
 
     async def test_lookback_window_with_custom_interval(self, all_aws, env_vars):
+        """Lookback window scales with a custom interval (30min -> 60min)."""
         os.environ["EXECUTION_INTERVAL_MINUTES"] = "30"
         loader = ConfigLoader()
         app_config = await loader.load()
         assert app_config.lookback_window_minutes == 60.0
 
     async def test_state_table_property(self, all_aws, env_vars):
+        """Exposes the DynamoDB table name from environment."""
         loader = ConfigLoader()
         assert loader.state_table == TEST_TABLE
 
     async def test_deployment_id_property(self, all_aws, env_vars):
+        """Exposes the deployment ID from environment."""
         loader = ConfigLoader()
         assert loader.deployment_id == TEST_DEPLOYMENT_ID
 
 
 class TestMissingEnvVars:
     def test_missing_config_bucket(self, env_vars):
+        """Raises ConfigError when CONFIG_BUCKET is not set."""
         os.environ.pop("CONFIG_BUCKET")
         with pytest.raises(ConfigError, match="CONFIG_BUCKET"):
             ConfigLoader()
 
     def test_missing_state_table(self, env_vars):
+        """Raises ConfigError when STATE_TABLE is not set."""
         os.environ.pop("STATE_TABLE")
         with pytest.raises(ConfigError, match="STATE_TABLE"):
             ConfigLoader()
 
     def test_missing_secrets_arn(self, env_vars):
+        """Raises ConfigError when SECRETS_ARN is not set."""
         os.environ.pop("SECRETS_ARN")
         with pytest.raises(ConfigError, match="SECRETS_ARN"):
             ConfigLoader()
 
     def test_missing_deployment_id(self, env_vars):
+        """Raises ConfigError when DEPLOYMENT_ID is not set."""
         os.environ.pop("DEPLOYMENT_ID")
         with pytest.raises(ConfigError, match="DEPLOYMENT_ID"):
             ConfigLoader()
 
     def test_missing_execution_interval(self, env_vars):
+        """Raises ConfigError when EXECUTION_INTERVAL_MINUTES is not set."""
         os.environ.pop("EXECUTION_INTERVAL_MINUTES")
         with pytest.raises(ConfigError, match="EXECUTION_INTERVAL_MINUTES"):
             ConfigLoader()
@@ -90,6 +100,7 @@ class TestMissingEnvVars:
 
 class TestSecretsErrors:
     async def test_missing_gemini_api_key(self, all_aws, env_vars):
+        """Raises ConfigError when gemini_api_key is absent from secrets."""
         # Re-create secret without gemini_api_key
         sm = all_aws["secretsmanager"]
         sm.delete_secret(SecretId=TEST_SECRETS_ARN, ForceDeleteWithoutRecovery=True)
@@ -101,6 +112,7 @@ class TestSecretsErrors:
             await loader.load()
 
     async def test_missing_youtube_api_key(self, all_aws, env_vars):
+        """Raises ConfigError when youtube_api_key is absent from secrets."""
         sm = all_aws["secretsmanager"]
         sm.delete_secret(SecretId=TEST_SECRETS_ARN, ForceDeleteWithoutRecovery=True)
         incomplete_secrets = {"gemini_api_key": "test-key"}
@@ -113,6 +125,7 @@ class TestSecretsErrors:
 
 class TestWebhookCrossValidation:
     async def test_missing_webhook_secret_key(self, all_aws, env_vars):
+        """Raises ConfigError when a notification's secret_key has no matching secret."""
         # Config references 'slack_webhook_team' but secrets only has API keys
         sm = all_aws["secretsmanager"]
         sm.delete_secret(SecretId=TEST_SECRETS_ARN, ForceDeleteWithoutRecovery=True)
