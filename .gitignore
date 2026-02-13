@@ -206,5 +206,8 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+# User config (contains API key references and personal channel settings)
+config.yaml
+
 # Claude Code
 .claude/
