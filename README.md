@@ -47,7 +47,15 @@ sam build
 sam deploy --guided
 ```
 
-Then store your secrets and upload `config.yaml` as described in the [deployment guide](docs/02_operation/00_deployment.md#step-3-store-secrets).
+Then store your secrets and upload `config.yaml`:
+
+```bash
+cp config.yaml.template config.yaml
+# Edit config.yaml with your settings
+aws s3 cp config.yaml s3://<bucket-name>/config.yaml
+```
+
+For details, see the [deployment guide](docs/02_operation/00_deployment.md#step-3-store-secrets).
 
 ## Development
 

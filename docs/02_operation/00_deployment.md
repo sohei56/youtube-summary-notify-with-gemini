@@ -96,32 +96,11 @@ aws secretsmanager put-secret-value \
 
 ## Step 4: Upload config.yaml
 
-Create `config.yaml` and upload it to the S3 bucket created by SAM. See `docs/01_design/02_data-design.md` for the full schema reference.
+Create `config.yaml` from the included template and upload it to the S3 bucket created by SAM. See `docs/01_design/02_data-design.md` for the full schema reference.
 
-```yaml
-channels:
-  - id: "UCxxxxxxxxxxxxxxxxxxxxxx"
-    name: "Channel Name"
-
-summarization:
-  model: "gemini-2.5-flash"
-  language: "en"
-  prompt_template: |
-    Watch the following YouTube video and provide a summary in {language}.
-    Summarize the main topics, conclusions, and key points in 3-5 sentences.
-    Video URL: {video_url}
-
-notifications:
-  - name: "team-updates"
-    platform: "slack"
-    secret_key: "slack_webhook_team_updates"
-    message_template: |
-      *{title}*
-      Channel: {channel}
-      Published: {published_at}
-      {url}
-
-      {summary}
+```bash
+cp config.yaml.template config.yaml
+# Edit config.yaml with your channel IDs, model preferences, and notification settings
 ```
 
 `secret_key` references a key within the `<stack-name>-secrets` JSON in Secrets Manager.
