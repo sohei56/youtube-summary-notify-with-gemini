@@ -13,16 +13,24 @@ The system runs as a scheduled AWS Lambda function. All user-editable settings (
 ## Architecture
 
 ```
-EventBridge (cron) ──▶ Lambda (Docker)
-                          │
-                ┌─────────┼─────────┐
-                ▼         ▼         ▼
-            S3 config  DynamoDB  Secrets Manager
-                          │
-               ┌──────────┼──────────┐
-               ▼          ▼          ▼
-          YouTube     Gemini API   Notification
-          Data API                 Webhooks
+┌──────────────────────────────────────────────┐
+│ AWS Account (user-owned)                      │
+│                                               │
+│  EventBridge            Lambda                │
+│  (cron rule) ────────▶ (Docker)               │
+│                         │    │                │
+│           ┌─────────────┘    │                │
+│           ▼                  │                │
+│     S3 (config)              │                │
+│     DynamoDB (state)         │                │
+│     Secrets Manager          │                │
+│                              │                │
+└──────────────────────────────│────────────────┘
+                               │
+                 ┌─────────────┼──────────────┐
+                 ▼             ▼              ▼
+            YouTube       Gemini API    Notification
+            Data API                    Webhooks
 ```
 
 For detailed architecture and design decisions, see [docs/01_design/](docs/01_design/).
