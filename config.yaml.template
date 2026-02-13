@@ -1,0 +1,48 @@
+# config.yaml — YouTube Summary Notify
+#
+# Copy this file to config.yaml, edit, and upload to S3:
+#   cp config.yaml.template config.yaml
+#   aws s3 cp config.yaml s3://<bucket-name>/config.yaml
+#
+# Full schema reference: docs/01_design/02_data-design.md
+
+# YouTube channels to monitor.
+# Find channel IDs: go to the channel page → "Share channel" → "Copy channel ID".
+# Channel IDs start with "UC" followed by 22 characters.
+channels:
+  - id: "UCxxxxxxxxxxxxxxxxxxxxxx"
+    name: "Channel Name"
+  # - id: "UCyyyyyyyyyyyyyyyyyyyyyy"
+  #   name: "Another Channel"
+
+# Summarization settings.
+summarization:
+  model: "gemini-2.5-flash"
+  language: "en"
+  prompt_template: |
+    Watch this video and provide a summary in {language}.
+    Summarize the main topics, conclusions, and key points in 3-5 sentences.
+
+# Notification targets. You can configure multiple.
+# Each target's secret_key must match a key in Secrets Manager (<stack-name>-secrets).
+notifications:
+  - name: "team-updates"
+    platform: "slack"
+    secret_key: "slack_webhook_team_updates"
+    message_template: |
+      *{title}*
+      Channel: {channel}
+      Published: {published_at}
+      {url}
+
+      {summary}
+  # - name: "another-target"
+  #   platform: "slack"
+  #   secret_key: "slack_webhook_another"
+  #   message_template: |
+  #     *{title}*
+  #     Channel: {channel}
+  #     Published: {published_at}
+  #     {url}
+  #
+  #     {summary}
