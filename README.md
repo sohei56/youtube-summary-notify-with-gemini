@@ -62,8 +62,6 @@ Then store your secrets and upload `config.yaml` as described in the [deployment
 ### Setup
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
