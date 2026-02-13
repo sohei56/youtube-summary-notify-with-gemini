@@ -51,7 +51,7 @@ For step-by-step API key acquisition and full deployment instructions, see [docs
 git clone git@github.com:sohei56/youtube-summary-notify-with-gemini.git
 cd youtube-summary-notify-with-gemini
 
-sam build
+sam build --template-file infra/template.yaml
 sam deploy --guided
 ```
 

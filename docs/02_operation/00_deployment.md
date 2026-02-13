@@ -40,7 +40,7 @@
 git clone git@github.com:sohei56/youtube-summary-notify-with-gemini.git
 cd youtube-summary-notify-with-gemini
 
-sam build
+sam build --template-file infra/template.yaml
 sam deploy --guided
 ```
 
@@ -48,14 +48,14 @@ sam deploy --guided
 
 | Parameter | Description | Example |
 |---|---|---|
-| Stack name | CloudFormation stack name | `yt-summary-notify` |
+| Stack name | CloudFormation stack name | `youtube-summary-notify` |
 | AWS Region | Deployment region | `ap-northeast-1` |
 | ExecutionInterval | Cron interval in minutes | `60` |
 | LogLevel | Python logging level (`DEBUG`, `INFO`, `WARNING`, `ERROR`) | `INFO` |
 
 SAM provisions: Lambda function, EventBridge rule, S3 bucket, DynamoDB table, and Secrets Manager secret.
 
-All resource names are prefixed with the stack name to avoid conflicts (e.g., stack name `yt-summary-notify` → secret `yt-summary-notify-secrets`).
+All resource names are prefixed with the stack name to avoid conflicts (e.g., stack name `youtube-summary-notify` → secret `youtube-summary-notify-secrets`).
 
 ## Step 3: Store Secrets
 
@@ -118,12 +118,11 @@ A channel ID starts with `UC` followed by 22 characters (e.g., `UCxxxxxxxxxxxxxx
 
 To find a channel ID:
 1. Go to the YouTube channel page
-2. View page source or use the channel URL — if the URL is `youtube.com/channel/UC...`, the ID is in the URL
-3. For `youtube.com/@handle` URLs, view page source and search for `channelId`
+2. Click "Share channel" → "Copy channel ID"
 
 ## Step 5: Verify
 
-The Lambda function name follows the pattern `<stack-name>-function` (e.g., `yt-summary-notify-function`).
+The Lambda function name follows the pattern `<stack-name>-function` (e.g., `youtube-summary-notify-function`).
 
 1. **Check Lambda is scheduled**: In the AWS Console, go to Lambda → find the function → check that the EventBridge trigger is attached.
 2. **Trigger a test execution**: Invoke the Lambda manually:
