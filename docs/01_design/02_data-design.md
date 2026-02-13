@@ -26,10 +26,9 @@ channels:
 summarization:
   model: "gemini-2.5-flash"        # Gemini model name (configurable)
   language: "en"                   # Summary language
-  prompt_template: |               # Prompt sent to Gemini. {video_url} and {language} are substituted.
-    Watch the following YouTube video and provide a summary in {language}.
+  prompt_template: |               # Prompt sent to Gemini. {language} is substituted.
+    Watch this video and provide a summary in {language}.
     Summarize the main topics, conclusions, and key points in 3-5 sentences.
-    Video URL: {video_url}
 
 notifications:                     # One or more notification targets
   - name: "team-updates"           # Unique identifier (used in logs)
@@ -57,7 +56,7 @@ notifications:                     # One or more notification targets
 |---|---|---|---|
 | `model` | Yes | `gemini-2.5-flash` | Gemini model name |
 | `language` | Yes | `en` | Language for generated summaries |
-| `prompt_template` | Yes | (see above) | Prompt template. `{video_url}` and `{language}` are substituted at runtime |
+| `prompt_template` | Yes | (see above) | Prompt template. `{language}` is substituted at runtime. Video is passed as a media part separately |
 
 ### notifications[]
 

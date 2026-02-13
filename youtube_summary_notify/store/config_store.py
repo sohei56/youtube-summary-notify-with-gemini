@@ -134,8 +134,6 @@ class ConfigStore:
                 raise ConfigError(f"summarization: missing required field '{field}'")
 
         prompt_template = str(raw["prompt_template"])
-        if "{video_url}" not in prompt_template:
-            raise ConfigError("summarization.prompt_template must contain '{video_url}'")
         if "{language}" not in prompt_template:
             raise ConfigError("summarization.prompt_template must contain '{language}'")
 

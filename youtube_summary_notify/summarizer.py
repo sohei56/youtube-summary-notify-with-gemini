@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from google import genai
 from google.genai import errors as genai_errors
+from google.genai.types import Part
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ class Summarizer:
             url: Full YouTube video URL.
             channel_name: Name of the channel that published the video.
             published_at: ISO 8601 publish timestamp.
-            prompt_template: Prompt template containing {video_url} and {language} placeholders.
+            prompt_template: Prompt template containing {language} placeholder.
             language: Language for the summary.
 
         Returns:
@@ -59,12 +60,15 @@ class Summarizer:
         Raises:
             SummarizerError: If the API call fails or returns no text.
         """
-        prompt = prompt_template.format(video_url=url, language=language)
+        prompt = prompt_template.format(language=language)
 
         try:
             response = await self._client.aio.models.generate_content(
                 model=self._model,
-                contents=prompt,
+                contents=[
+                    Part.from_uri(file_uri=url, mime_type="video/mp4"),
+                    prompt,
+                ],
             )
         except genai_errors.ClientError as exc:
             raise SummarizerError(f"Gemini API client error for '{title}' ({video_id}): {exc}") from exc

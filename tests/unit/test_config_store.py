@@ -37,7 +37,6 @@ class TestLoadConfigHappyPath:
         config = await store.load_config()
         assert config.summarization.model == "gemini-2.5-flash"
         assert config.summarization.language == "en"
-        assert "{video_url}" in config.summarization.prompt_template
         assert "{language}" in config.summarization.prompt_template
 
     async def test_returns_correct_notifications(self, store):
@@ -116,19 +115,10 @@ class TestLoadConfigValidation:
         with pytest.raises(ConfigError, match="invalid channel ID"):
             await store.load_config()
 
-    async def test_prompt_template_missing_video_url(self, s3_bucket):
-        """Rejects prompt templates without the {video_url} placeholder."""
-        cfg = copy.deepcopy(VALID_CONFIG)
-        cfg["summarization"]["prompt_template"] = "Summarize in {language}"
-        _put_config(s3_bucket, cfg)
-        store = ConfigStore(s3_bucket=TEST_BUCKET)
-        with pytest.raises(ConfigError, match="\\{video_url\\}"):
-            await store.load_config()
-
     async def test_prompt_template_missing_language(self, s3_bucket):
         """Rejects prompt templates without the {language} placeholder."""
         cfg = copy.deepcopy(VALID_CONFIG)
-        cfg["summarization"]["prompt_template"] = "Summarize {video_url}"
+        cfg["summarization"]["prompt_template"] = "Summarize this video"
         _put_config(s3_bucket, cfg)
         store = ConfigStore(s3_bucket=TEST_BUCKET)
         with pytest.raises(ConfigError, match="\\{language\\}"):

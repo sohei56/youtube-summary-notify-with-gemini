@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from google.genai import errors as genai_errors
+from google.genai.types import Part
 
 from youtube_summary_notify.summarizer import Summarizer, SummarizerError, SummaryResult
 
@@ -14,7 +15,7 @@ CHANNEL_NAME = "Test Channel"
 PUBLISHED_AT = "2026-02-12T10:00:00Z"
 MODEL = "gemini-2.5-flash"
 API_KEY = "test-api-key"
-PROMPT_TEMPLATE = "Summarize this video in {language}: {video_url}"
+PROMPT_TEMPLATE = "Summarize this video in {language}"
 LANGUAGE = "en"
 
 
@@ -58,7 +59,7 @@ class TestSummarizeHappyPath:
         assert result.summary == "A great summary of the video."
 
     async def test_substitutes_prompt_template(self):
-        """Replaces {language} and {video_url} in the prompt before sending to Gemini."""
+        """Replaces {language} in the prompt before sending to Gemini."""
         mock_client = _make_mock_client("Summary text.")
         summarizer = _make_summarizer(mock_client)
 
@@ -72,10 +73,12 @@ class TestSummarizeHappyPath:
             language=LANGUAGE,
         )
 
-        mock_client.aio.models.generate_content.assert_called_once_with(
-            model=MODEL,
-            contents=f"Summarize this video in {LANGUAGE}: {URL}",
-        )
+        call_kwargs = mock_client.aio.models.generate_content.call_args
+        contents = call_kwargs.kwargs["contents"]
+        assert len(contents) == 2
+        assert isinstance(contents[0], Part)
+        assert contents[0].file_data.file_uri == URL
+        assert contents[1] == f"Summarize this video in {LANGUAGE}"
 
     async def test_uses_configured_model(self):
         """Passes the configured model name to the Gemini client."""
@@ -92,10 +95,12 @@ class TestSummarizeHappyPath:
             language="ja",
         )
 
-        mock_client.aio.models.generate_content.assert_called_once_with(
-            model="gemini-2.0-flash",
-            contents=f"Summarize this video in ja: {URL}",
-        )
+        call_kwargs = mock_client.aio.models.generate_content.call_args
+        assert call_kwargs.kwargs["model"] == "gemini-2.0-flash"
+        contents = call_kwargs.kwargs["contents"]
+        assert isinstance(contents[0], Part)
+        assert contents[0].file_data.file_uri == URL
+        assert contents[1] == "Summarize this video in ja"
 
 
 class TestSummarizeEmptyResponse:

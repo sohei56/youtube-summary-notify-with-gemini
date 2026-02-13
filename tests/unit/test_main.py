@@ -37,7 +37,7 @@ def _make_config(
         summarization=Summarization(
             model="gemini-2.5-flash",
             language="en",
-            prompt_template="Summarize in {language}: {video_url}",
+            prompt_template="Summarize in {language}",
         ),
         notifications=notifications
         or [
@@ -272,7 +272,7 @@ class TestSummarizeVideos:
         await _summarize_videos(summarizer, videos, app_config)
 
         call_kwargs = summarizer.summarize.call_args.kwargs
-        assert call_kwargs["prompt_template"] == "Summarize in {language}: {video_url}"
+        assert call_kwargs["prompt_template"] == "Summarize in {language}"
         assert call_kwargs["language"] == "en"
 
 

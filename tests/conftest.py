@@ -17,7 +17,7 @@ VALID_CONFIG = {
         "model": "gemini-2.5-flash",
         "language": "en",
         "prompt_template": (
-            "Watch the following YouTube video and provide a summary in {language}.\nVideo URL: {video_url}\n"
+            "Watch this video and provide a summary in {language}.\n"
         ),
     },
     "notifications": [
