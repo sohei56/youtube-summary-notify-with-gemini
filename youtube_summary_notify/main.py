@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 from dataclasses import dataclass
 
 import httpx
@@ -229,6 +230,7 @@ def _build_error_message(successes: list[SummaryResult], failures: list[FailedVi
 
 def handler(event: dict, context: object) -> dict:
     """AWS Lambda entry point."""
-    logging.basicConfig(level=logging.INFO)
+    log_level = os.environ.get("LOG_LEVEL", "INFO")
+    logging.basicConfig(level=logging.getLevelName(log_level))
     asyncio.run(run())
     return {"statusCode": 200}

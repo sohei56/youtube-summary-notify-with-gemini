@@ -51,6 +51,7 @@ sam deploy --guided
 | Stack name | CloudFormation stack name | `yt-summary-notify` |
 | AWS Region | Deployment region | `ap-northeast-1` |
 | ExecutionInterval | Cron interval in minutes | `60` |
+| LogLevel | Python logging level (`DEBUG`, `INFO`, `WARNING`, `ERROR`) | `INFO` |
 
 SAM provisions: Lambda function, EventBridge rule, S3 bucket, DynamoDB table, and Secrets Manager secret.
 

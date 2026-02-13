@@ -7,6 +7,15 @@ Parameters:
     Type: Number
     Default: 60
     Description: Execution interval in minutes
+  LogLevel:
+    Type: String
+    Default: INFO
+    AllowedValues:
+      - DEBUG
+      - INFO
+      - WARNING
+      - ERROR
+    Description: Python logging level for the Lambda function
 
 Resources:
   Function:
@@ -23,6 +32,7 @@ Resources:
           SECRETS_ARN: !Ref Secrets
           DEPLOYMENT_ID: !Sub "${AWS::StackName}"
           EXECUTION_INTERVAL_MINUTES: !Ref ExecutionInterval
+          LOG_LEVEL: !Ref LogLevel
       Policies:
         - S3ReadPolicy:
             BucketName: !Ref ConfigBucket
