@@ -57,33 +57,9 @@ sam deploy --guided
 
 Then store your secrets and upload `config.yaml` as described in the [deployment guide](docs/02_operation/00_deployment.md#step-3-store-secrets).
 
-## Development
+## Contributing
 
-### Setup
-
-```bash
-pip install -e ".[dev]"
-```
-
-### Run Tests
-
-```bash
-# All tests
-pytest tests/ -v
-
-# Unit tests only
-pytest tests/unit/ -v
-
-# E2E tests only
-pytest tests/e2e/ -v
-```
-
-### Lint & Format
-
-```bash
-ruff check .
-ruff format .
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, testing, and contribution guidelines.
 
 ## Documentation
 
