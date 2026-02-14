@@ -1,4 +1,4 @@
-"""Tests for BaseNotifier and SlackNotifier."""
+"""Tests for BaseNotifier, SlackNotifier, and DiscordNotifier."""
 
 import json
 
@@ -6,9 +6,11 @@ import httpx
 import pytest
 
 from youtube_summary_notify.notifiers.base import BaseNotifier, VideoInfo
+from youtube_summary_notify.notifiers.discord import DiscordNotifier
 from youtube_summary_notify.notifiers.slack import SlackNotifier
 
-WEBHOOK_URL = "https://hooks.slack.com/services/T00/B00/xxx"
+SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/T00/B00/xxx"
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/123456/abcdef"
 NAME = "team-updates"
 MESSAGE_TEMPLATE = "*{title}*\nChannel: {channel}\nPublished: {published_at}\n{url}\n\n{summary}"
 
@@ -79,7 +81,7 @@ class TestSlackSendSummary:
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             result = await notifier.send_summary(VIDEO)
 
@@ -90,7 +92,7 @@ class TestSlackSendSummary:
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             await notifier.send_summary(VIDEO)
 
@@ -106,19 +108,19 @@ class TestSlackSendSummary:
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             await notifier.send_summary(VIDEO)
 
         req = transport.captured[0]
-        assert str(req.url) == WEBHOOK_URL
+        assert str(req.url) == SLACK_WEBHOOK_URL
 
     async def test_http_error_returns_false(self):
         """Returns False on HTTP 500 response."""
         transport = _mock_transport(500, "internal error")
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             result = await notifier.send_summary(VIDEO)
 
@@ -133,7 +135,7 @@ class TestSlackSendSummary:
         transport = httpx.MockTransport(raise_error)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             result = await notifier.send_summary(VIDEO)
 
@@ -146,7 +148,7 @@ class TestSlackSendError:
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             result = await notifier.send_error("Something went wrong")
 
@@ -157,7 +159,7 @@ class TestSlackSendError:
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             await notifier.send_error("3 videos failed summarization")
 
@@ -170,7 +172,7 @@ class TestSlackSendError:
         transport = _mock_transport(403, "forbidden")
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             result = await notifier.send_error("error message")
 
@@ -185,7 +187,7 @@ class TestSlackSendError:
         transport = httpx.MockTransport(raise_error)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             result = await notifier.send_error("error message")
 
@@ -198,7 +200,7 @@ class TestSlackMessageFormat:
         template = "{channel} | {title} | {url} | {published_at} | {summary}"
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
-            notifier = SlackNotifier(name=NAME, webhook_url=WEBHOOK_URL, message_template=template, http_client=client)
+            notifier = SlackNotifier(name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=template, http_client=client)
             await notifier.send_summary(VIDEO)
 
         body = json.loads(transport.captured[0].content)
@@ -213,7 +215,157 @@ class TestSlackMessageFormat:
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
             notifier = SlackNotifier(
-                name=NAME, webhook_url=WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            await notifier.send_summary(VIDEO)
+
+        req = transport.captured[0]
+        assert "application/json" in req.headers["content-type"]
+
+
+class TestDiscordSendSummary:
+    async def test_success_returns_true(self):
+        """Returns True on successful webhook delivery."""
+        transport = _mock_transport(200)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            result = await notifier.send_summary(VIDEO)
+
+        assert result is True
+
+    async def test_posts_formatted_message_with_content_key(self):
+        """Sends the formatted message using the 'content' key in JSON payload."""
+        transport = _mock_transport(200)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            await notifier.send_summary(VIDEO)
+
+        assert len(transport.captured) == 1
+        req = transport.captured[0]
+        body = json.loads(req.content)
+        assert "content" in body
+        assert "Test Video Title" in body["content"]
+        assert "This is a great summary of the video." in body["content"]
+
+    async def test_posts_to_webhook_url(self):
+        """Posts to the configured webhook URL."""
+        transport = _mock_transport(200)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            await notifier.send_summary(VIDEO)
+
+        req = transport.captured[0]
+        assert str(req.url) == DISCORD_WEBHOOK_URL
+
+    async def test_http_error_returns_false(self):
+        """Returns False on HTTP 500 response."""
+        transport = _mock_transport(500, "internal error")
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            result = await notifier.send_summary(VIDEO)
+
+        assert result is False
+
+    async def test_network_error_returns_false(self):
+        """Returns False on network connection failure."""
+
+        def raise_error(request: httpx.Request) -> httpx.Response:
+            raise httpx.ConnectError("Connection refused")
+
+        transport = httpx.MockTransport(raise_error)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            result = await notifier.send_summary(VIDEO)
+
+        assert result is False
+
+
+class TestDiscordSendError:
+    async def test_success_returns_true(self):
+        """Returns True on successful error notification delivery."""
+        transport = _mock_transport(200)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            result = await notifier.send_error("Something went wrong")
+
+        assert result is True
+
+    async def test_posts_error_message_with_content_key(self):
+        """Sends the error string using 'content' key, bypassing the template."""
+        transport = _mock_transport(200)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            await notifier.send_error("3 videos failed summarization")
+
+        req = transport.captured[0]
+        body = json.loads(req.content)
+        assert body["content"] == "3 videos failed summarization"
+
+    async def test_http_error_returns_false(self):
+        """Returns False on HTTP 403 response."""
+        transport = _mock_transport(403, "forbidden")
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            result = await notifier.send_error("error message")
+
+        assert result is False
+
+    async def test_network_error_returns_false(self):
+        """Returns False on network connection failure."""
+
+        def raise_error(request: httpx.Request) -> httpx.Response:
+            raise httpx.ConnectError("Connection refused")
+
+        transport = httpx.MockTransport(raise_error)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
+            )
+            result = await notifier.send_error("error message")
+
+        assert result is False
+
+
+class TestDiscordMessageFormat:
+    async def test_all_template_variables_substituted(self):
+        """All five template variables are substituted in the sent message."""
+        template = "{channel} | {title} | {url} | {published_at} | {summary}"
+        transport = _mock_transport(200)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=template, http_client=client
+            )
+            await notifier.send_summary(VIDEO)
+
+        body = json.loads(transport.captured[0].content)
+        expected = (
+            "Test Channel | Test Video Title | https://www.youtube.com/watch?v=abc123"
+            " | 2026-02-12T10:00:00Z | This is a great summary of the video."
+        )
+        assert body["content"] == expected
+
+    async def test_json_content_type(self):
+        """Request uses application/json content type."""
+        transport = _mock_transport(200)
+        async with httpx.AsyncClient(transport=transport) as client:
+            notifier = DiscordNotifier(
+                name=NAME, webhook_url=DISCORD_WEBHOOK_URL, message_template=MESSAGE_TEMPLATE, http_client=client
             )
             await notifier.send_summary(VIDEO)
 

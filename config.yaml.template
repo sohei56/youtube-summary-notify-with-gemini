@@ -48,8 +48,18 @@ notifications:
   #   secret_key: "slack_webhook_another"
   #   message_template: |
   #     *{title}*
-  #     Channel: {channel}
-  #     Published: {published_at}
-  #     {url}
+  #     • Channel: {channel}
+  #     • Published: {published_at}
+  #     • URL: {url}
+  #
+  #     {summary}
+  # - name: "private"
+  #   platform: "discord"
+  #   secret_key: "discord_webhook_private"
+  #   message_template: |
+  #     **{title}**
+  #     - Channel: {channel}
+  #     - Published: {published_at}
+  #     - URL: {url}
   #
   #     {summary}

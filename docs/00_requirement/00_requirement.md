@@ -22,12 +22,12 @@
 
 - Send generated summaries to all configured notification targets. All targets receive the same summaries.
 - Multiple targets can be configured in `config.yaml` under `notifications` (e.g., two Slack channels, or Slack + Discord).
-- v1 implements Slack only (Incoming Webhooks).
+- Supported platforms: Slack (Incoming Webhooks), Discord (Discord Webhooks).
 - **Per-target configuration**: each target specifies `name` (unique identifier), `platform`, `secret_key` (key within the `<stack-name>-secrets` JSON in Secrets Manager), and `message_template`.
 - **Message template**: each target has its own template, allowing platform-specific formatting. The system substitutes video metadata variables at runtime (see `docs/01_design/02_data-design.md` for the full list of template variables).
 - If one target fails, the others still receive their notifications. The failure is included in the error summary.
 - On execution with errors, send a separate error message to all targets at the end (see NF-1).
-- Architecture supports future platforms (Discord, etc.) via a pluggable interface (`notifiers/base.py`).
+- Architecture supports additional platforms via a pluggable interface (`notifiers/base.py`).
 
 ### F-4: Duplicate Prevention
 

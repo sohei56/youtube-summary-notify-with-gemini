@@ -113,6 +113,30 @@ class TestBuildNotifiers:
         assert len(notifiers) == 1
         assert notifiers[0].name == "team-slack"
 
+    def test_creates_discord_notifier(self):
+        """Creates a single Discord notifier from config."""
+        config = _make_config(
+            notifications=[
+                Notification(
+                    name="team-discord",
+                    platform="discord",
+                    secret_key="discord_webhook_team",
+                    message_template="**{title}**\n{summary}",
+                ),
+            ]
+        )
+        secrets = _make_secrets(
+            webhook_urls={"discord_webhook_team": "https://discord.com/api/webhooks/123/abc"}
+        )
+        app_config = _make_app_config(config=config, secrets=secrets)
+        notifiers = _build_notifiers(app_config)
+        assert len(notifiers) == 1
+        assert notifiers[0].name == "team-discord"
+
+        from youtube_summary_notify.notifiers.discord import DiscordNotifier
+
+        assert isinstance(notifiers[0], DiscordNotifier)
+
     def test_creates_multiple_notifiers(self):
         """Creates one notifier per notification target in config."""
         config = _make_config(
