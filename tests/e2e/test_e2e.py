@@ -511,7 +511,7 @@ class TestSummarizationFailure:
             assert len(error_msgs) == 1
             assert "2 succeeded" in error_msgs[0]
             assert "1 failed" in error_msgs[0]
-            assert "Video Two" in error_msgs[0]
+            assert "Gemini timeout" in error_msgs[0]
 
             # DynamoDB contains only successes
             ids = _dynamo_video_ids(table)

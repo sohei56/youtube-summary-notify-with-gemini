@@ -11,9 +11,9 @@
 
 ### F-2: Video Summarization
 
-- Pass the YouTube URL of each new video directly to the Gemini API for summarization.
+- Pass each new video directly to the Gemini API as a structured media part for summarization.
 - Gemini analyzes the video natively (visual frames + audio) — no transcript extraction or preprocessing required.
-- **Prompt template**: stored in S3 config file (`config.yaml`). The system only substitutes the video URL into the template at runtime. Users can edit the prompt freely by updating the S3 file — no SAM redeployment required.
+- **Prompt template**: stored in S3 config file (`config.yaml`). The system substitutes `{language}` into the template at runtime. Users can edit the prompt freely by updating the S3 file — no SAM redeployment required.
 - **Summary language**: managed within the same S3 config file (default: `en`).
 - **Gemini model**: managed within the same S3 config file (default: `gemini-2.5-flash`). Users can change the model without redeployment.
 - See `docs/03_external_apis/01_gemini-api.md` for model recommendations.

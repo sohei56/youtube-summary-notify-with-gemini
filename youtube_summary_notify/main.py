@@ -224,7 +224,7 @@ def _build_error_message(successes: list[SummaryResult], failures: list[FailedVi
         "Failed videos:",
     ]
     for f in failures:
-        lines.append(f"- {f.title} ({f.url}): {f.error}")
+        lines.append(f"• {f.error}")
     return "\n".join(lines)
 
 

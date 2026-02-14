@@ -17,8 +17,7 @@ Each Lambda execution follows this sequence:
 
 3. Summarize Videos
    ├── For each new video (concurrently, limited by semaphore):
-   │   ├── Substitute video URL into prompt template
-   │   ├── Call Gemini API
+   │   ├── Pass video as media part + substituted prompt to Gemini API
    │   └── Collect result (success or error)
    └── Separate successes and failures
 
@@ -65,7 +64,8 @@ Detects new videos from monitored channels.
 
 Generates video summaries using Gemini.
 
-- Substitutes video URL into the prompt template
+- Passes the YouTube video as a structured media part via `Part.from_uri()`
+- Substitutes `{language}` into the prompt template
 - Calls Gemini API with the configured model
 - Returns summary text on success, or error details on failure
 - Handles Gemini-specific errors (rate limit, timeout, content filtering)

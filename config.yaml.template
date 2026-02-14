@@ -20,8 +20,15 @@ summarization:
   model: "gemini-2.5-flash"
   language: "en"
   prompt_template: |
-    Watch this video and provide a summary in {language}.
-    Summarize the main topics, conclusions, and key points in 3-5 sentences.
+    Watch this video and respond in {language}.
+
+    Output format(Markdown):
+    1) Key points (bulleted): Provide 1-4 bullet points capturing the most important takeaways.
+    2) Summary (3-5 sentences): Explain the video’s main topics, conclusions, and key points.
+
+    Guidelines:
+    - Be specific and grounded in the video content (avoid generic filler).
+    - If the video is a live stream or very long, focus on the main segments and overall conclusion.
 
 # Notification targets. You can configure multiple.
 # Each target's secret_key must match a key in Secrets Manager (<stack-name>-secrets).
@@ -31,9 +38,9 @@ notifications:
     secret_key: "slack_webhook_team_updates"
     message_template: |
       *{title}*
-      Channel: {channel}
-      Published: {published_at}
-      {url}
+      • Channel: {channel}
+      • Published: {published_at}
+      • URL: {url}
 
       {summary}
   # - name: "another-target"

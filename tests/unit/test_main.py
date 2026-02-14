@@ -286,16 +286,13 @@ class TestBuildErrorMessage:
         assert "1 failed" in msg
 
     def test_includes_failed_video_details(self):
-        """Error message includes each failed video's title, URL, and error."""
+        """Error message includes each failed video's error."""
         failures = [
             FailedVideo(title="Video A", url="https://yt/a", error="Rate limited"),
             FailedVideo(title="Video B", url="https://yt/b", error="Timeout"),
         ]
         msg = _build_error_message([], failures)
-        assert "Video A" in msg
-        assert "https://yt/a" in msg
         assert "Rate limited" in msg
-        assert "Video B" in msg
         assert "Timeout" in msg
 
 
@@ -421,7 +418,7 @@ class TestRunFullPipeline:
         error_msg = notifier.send_error.call_args[0][0]
         assert "1 succeeded" in error_msg
         assert "1 failed" in error_msg
-        assert "Bad Video" in error_msg
+        assert "Gemini timeout" in error_msg
 
         # Only the successful video written to state
         state_instance.put_notified_ids.assert_called_once_with(["vid_ok"])

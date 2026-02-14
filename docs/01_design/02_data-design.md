@@ -27,8 +27,15 @@ summarization:
   model: "gemini-2.5-flash"        # Gemini model name (configurable)
   language: "en"                   # Summary language
   prompt_template: |               # Prompt sent to Gemini. {language} is substituted.
-    Watch this video and provide a summary in {language}.
-    Summarize the main topics, conclusions, and key points in 3-5 sentences.
+    Watch this video and respond in {language}.
+
+    Output format(Markdown):
+    1) Key points (bulleted): Provide 1-4 bullet points capturing the most important takeaways.
+    2) Summary (3-5 sentences): Explain the video's main topics, conclusions, and key points.
+
+    Guidelines:
+    - Be specific and grounded in the video content (avoid generic filler).
+    - If the video is a live stream or very long, focus on the main segments and overall conclusion.
 
 notifications:                     # One or more notification targets
   - name: "team-updates"           # Unique identifier (used in logs)
