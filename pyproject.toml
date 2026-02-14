@@ -6,13 +6,27 @@ build-backend = "hatchling.build"
 name = "youtube-summary-notify"
 version = "0.1.0"
 description = "Automatically detect new YouTube videos, summarize with Gemini AI, and notify via webhooks"
+license = "MIT"
+authors = [{ name = "sohei" }]
+readme = "README.md"
 requires-python = ">=3.12"
+keywords = ["youtube", "gemini", "summary", "notification", "slack", "aws-lambda"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "boto3",
     "pyyaml",
     "httpx",
     "google-genai",
 ]
+
+[project.urls]
+Homepage = "https://github.com/sohei56/youtube-summary-notify-with-gemini"
+Repository = "https://github.com/sohei56/youtube-summary-notify-with-gemini"
+Issues = "https://github.com/sohei56/youtube-summary-notify-with-gemini/issues"
 
 [project.optional-dependencies]
 dev = [

@@ -181,6 +181,7 @@ class TestFetchRecentVideosAPIErrors:
 
     async def test_network_error_raises_youtube_client_error(self):
         """Wraps network-level failures as YouTubeClientError."""
+
         def raise_error(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("Connection refused")
 
