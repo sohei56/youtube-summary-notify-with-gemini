@@ -8,7 +8,7 @@ This system uses three storage backends. This document defines the schema and st
 |---|---|
 | S3 (`config.yaml`) | User-editable configuration (channels, prompts, templates, model) |
 | DynamoDB (`video_state`) | Notified video state for duplicate prevention |
-| Secrets Manager (`<stack-name>-secrets`) | API keys and Webhook URLs |
+| secrets (Secrets Manager) | API keys and Webhook URLs |
 
 ## config.yaml (S3)
 
@@ -102,7 +102,7 @@ Tracks which videos have been notified to prevent duplicates. Retains the last 5
 - Sort key `video_id` enables efficient lookups and batch writes.
 - `notified_at` is used to determine oldest entries for cleanup (delete oldest when count exceeds 500).
 
-## Secrets Manager (`<stack-name>-secrets`)
+## secrets (Secrets Manager)
 
 Single JSON object containing all secrets. The secret name is `<stack-name>-secrets`, created by SAM.
 
