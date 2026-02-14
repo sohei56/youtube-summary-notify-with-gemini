@@ -38,7 +38,14 @@ Key points:
 All tests must pass before submitting a PR.
 
 ```bash
+# All tests
 pytest tests/ -v
+
+# Unit tests only
+pytest tests/unit/ -v
+
+# E2E tests only
+pytest tests/e2e/ -v
 ```
 
 ## Pull Request Workflow
