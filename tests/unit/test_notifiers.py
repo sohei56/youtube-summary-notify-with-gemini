@@ -200,7 +200,9 @@ class TestSlackMessageFormat:
         template = "{channel} | {title} | {url} | {published_at} | {summary}"
         transport = _mock_transport(200)
         async with httpx.AsyncClient(transport=transport) as client:
-            notifier = SlackNotifier(name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=template, http_client=client)
+            notifier = SlackNotifier(
+                name=NAME, webhook_url=SLACK_WEBHOOK_URL, message_template=template, http_client=client
+            )
             await notifier.send_summary(VIDEO)
 
         body = json.loads(transport.captured[0].content)
