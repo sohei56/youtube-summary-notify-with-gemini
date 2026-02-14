@@ -125,9 +125,7 @@ class TestBuildNotifiers:
                 ),
             ]
         )
-        secrets = _make_secrets(
-            webhook_urls={"discord_webhook_team": "https://discord.com/api/webhooks/123/abc"}
-        )
+        secrets = _make_secrets(webhook_urls={"discord_webhook_team": "https://discord.com/api/webhooks/123/abc"})
         app_config = _make_app_config(config=config, secrets=secrets)
         notifiers = _build_notifiers(app_config)
         assert len(notifiers) == 1
