@@ -9,7 +9,7 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_PLATFORMS = ("slack",)
+SUPPORTED_PLATFORMS = ("slack", "discord")
 
 
 class ConfigError(Exception):

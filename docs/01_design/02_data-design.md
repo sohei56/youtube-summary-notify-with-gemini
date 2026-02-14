@@ -39,10 +39,20 @@ summarization:
 
 notifications:                     # One or more notification targets
   - name: "team-updates"           # Unique identifier (used in logs)
-    platform: "slack"              # Platform type: "slack" (v1), "discord" (future)
+    platform: "slack"              # Platform type: "slack" or "discord"
     secret_key: "slack_webhook_team_updates"  # Key in Secrets Manager JSON
     message_template: |            # Platform-specific message template
       *{title}*
+      Channel: {channel}
+      Published: {published_at}
+      {url}
+
+      {summary}
+  - name: "discord-private"
+    platform: "discord"
+    secret_key: "discord_webhook_private"
+    message_template: |
+      **{title}**
       Channel: {channel}
       Published: {published_at}
       {url}
@@ -70,7 +80,7 @@ notifications:                     # One or more notification targets
 | Field | Required | Description |
 |---|---|---|
 | `name` | Yes | Unique identifier for this target (used in logs and error messages) |
-| `platform` | Yes | `slack` (v1), `discord` (future) |
+| `platform` | Yes | `slack` or `discord` |
 | `secret_key` | Yes | Key within the `<stack-name>-secrets` JSON in Secrets Manager |
 | `message_template` | Yes | Platform-specific message template |
 
@@ -112,7 +122,8 @@ Single JSON object containing all secrets. The secret name is `<stack-name>-secr
 {
   "gemini_api_key": "...",
   "youtube_api_key": "...",
-  "slack_webhook_team_updates": "https://hooks.slack.com/services/..."
+  "slack_webhook_team_updates": "https://hooks.slack.com/services/...",
+  "discord_webhook_private": "https://discord.com/api/webhooks/..."
 }
 ```
 

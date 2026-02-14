@@ -9,6 +9,7 @@ import httpx
 
 from youtube_summary_notify.config import ApplicationConfig, ConfigLoader
 from youtube_summary_notify.notifiers.base import BaseNotifier, VideoInfo
+from youtube_summary_notify.notifiers.discord import DiscordNotifier
 from youtube_summary_notify.notifiers.slack import SlackNotifier
 from youtube_summary_notify.store.config_store import ConfigError, Notification
 from youtube_summary_notify.store.video_state_store import VideoStateStore
@@ -122,6 +123,13 @@ def _create_notifier(
     """Create a single notifier instance based on platform type."""
     if notification.platform == "slack":
         return SlackNotifier(
+            name=notification.name,
+            webhook_url=webhook_url,
+            message_template=notification.message_template,
+            http_client=http_client,
+        )
+    elif notification.platform == "discord":
+        return DiscordNotifier(
             name=notification.name,
             webhook_url=webhook_url,
             message_template=notification.message_template,

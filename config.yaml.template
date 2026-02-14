@@ -14,6 +14,10 @@ channels:
     name: "Channel Name"
   # - id: "UCyyyyyyyyyyyyyyyyyyyyyy"
   #   name: "Another Channel"
+  # - id: "UC16niRr50-MSBwiO3YDb3RA"
+  #   name: "BBC News"
+  # - id: "UCIALMKvObZNtJ6AmdCLP7Lg"
+  #   name: "Bloomberg Television"
 
 # Summarization settings.
 summarization:
@@ -23,8 +27,7 @@ summarization:
     Watch this video and respond in {language}.
 
     Output format(Markdown):
-    1) Key points (bulleted): Provide 1-4 bullet points capturing the most important takeaways.
-    2) Summary (3-5 sentences): Explain the video’s main topics, conclusions, and key points.
+      Key points (bulleted): Provide 1-4 bullet points capturing the most important takeaways.
 
     Guidelines:
     - Be specific and grounded in the video content (avoid generic filler).
@@ -48,8 +51,18 @@ notifications:
   #   secret_key: "slack_webhook_another"
   #   message_template: |
   #     *{title}*
-  #     Channel: {channel}
-  #     Published: {published_at}
-  #     {url}
+  #     • Channel: {channel}
+  #     • Published: {published_at}
+  #     • URL: {url}
+  #
+  #     {summary}
+  # - name: "private"
+  #   platform: "discord"
+  #   secret_key: "discord_webhook_private"
+  #   message_template: |
+  #     **{title}**
+  #     - Channel: {channel}
+  #     - Published: {published_at}
+  #     - URL: {url}
   #
   #     {summary}

@@ -23,7 +23,7 @@
             Data API                    Webhooks
 ```
 
-The system runs as a single Lambda function triggered on a schedule. It reads configuration from S3, detects new videos via YouTube Data API, summarizes them via Gemini API, and sends notifications via configured webhooks (currently Slack; pluggable for future platforms).
+The system runs as a single Lambda function triggered on a schedule. It reads configuration from S3, detects new videos via YouTube Data API, summarizes them via Gemini API, and sends notifications via configured webhooks (Slack, Discord).
 
 ## AWS Resource Summary
 

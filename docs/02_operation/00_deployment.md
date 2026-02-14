@@ -34,6 +34,15 @@
 6. Copy the Webhook URL — you will need it in Step 3
 7. Repeat for each notification target if configuring multiple
 
+### Discord Webhook URL
+
+1. Open the Discord server and go to the target channel
+2. Click the gear icon (Edit Channel) → "Integrations" → "Webhooks"
+3. Click "New Webhook"
+4. (Optional) Set a name and avatar for the webhook
+5. Click "Copy Webhook URL" — you will need it in Step 3
+6. Repeat for each notification target if configuring multiple
+
 ## Step 2: Deploy Infrastructure
 
 ```bash
@@ -67,7 +76,8 @@ aws secretsmanager put-secret-value \
   --secret-string '{
     "gemini_api_key": "your-gemini-api-key",
     "youtube_api_key": "your-youtube-api-key",
-    "slack_webhook_team_updates": "https://hooks.slack.com/services/T.../B.../..."
+    "slack_webhook_team_updates": "https://hooks.slack.com/services/T.../B.../...",
+    "discord_webhook_private": "https://discord.com/api/webhooks/123456789/abcdef..."
   }'
 ```
 
@@ -133,7 +143,7 @@ The Lambda function name follows the pattern `<stack-name>-function` (e.g., `you
      response.json
    ```
 3. **Check logs**: Go to CloudWatch Logs → find the log group `/aws/lambda/<stack-name>-function` → verify execution logs.
-4. **Check Slack**: Confirm that summary notifications appear in the configured channel (if monitored channels have recent videos).
+4. **Check notifications**: Confirm that summary notifications appear in the configured Slack channel and/or Discord channel (if monitored channels have recent videos).
 
 ## Updating Configuration
 

@@ -20,7 +20,7 @@ This project is designed as a self-hostable OSS tool. Users deploy it to their o
 - **Language**: Python 3.12+
 - **Video Summarization**: Gemini API
 - **New Video Detection**: YouTube Data API v3
-- **Notification**: Slack Incoming Webhooks (v1), Discord (future scope)
+- **Notification**: Slack Incoming Webhooks, Discord Webhooks
 - **Execution**: AWS Lambda + EventBridge
 - **Infrastructure as Code**: AWS SAM
 - **Storage**: Amazon S3 (config) + Amazon DynamoDB (state)
