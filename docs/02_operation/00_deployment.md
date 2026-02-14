@@ -165,15 +165,3 @@ aws logs delete-log-group \
 ```
 
 `sam delete` will prompt for confirmation. All resources provisioned by the SAM template are deleted, including the DynamoDB table and its data.
-
-## Troubleshooting
-
-| Symptom | Likely Cause | Resolution |
-|---|---|---|
-| No notifications at all | Initialization failure (bad API key, missing config) | Check CloudWatch logs for ERROR at start of execution |
-| Duplicate notifications | DynamoDB write failure on previous run | Check logs for state write errors. Will self-resolve on next successful run |
-| Missing videos | Video published outside the 2× interval window | Reduce execution interval or check channel publish patterns |
-| Gemini timeout errors | Long videos or API congestion | Check video length. Consider increasing per-request timeout |
-| Gemini 429 errors | Rate limit exceeded | Reduce number of channels or switch to paid tier |
-| Slack notifications not appearing | Invalid Webhook URL | Verify Webhook URL in Secrets Manager. Test with `curl` |
-| Lambda timeout (15 min) | Too many videos or long Gemini response times | Reduce channels, reduce execution interval (fewer videos per run) |
