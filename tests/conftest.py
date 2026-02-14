@@ -16,9 +16,7 @@ VALID_CONFIG = {
     "summarization": {
         "model": "gemini-2.5-flash",
         "language": "en",
-        "prompt_template": (
-            "Watch this video and provide a summary in {language}.\n"
-        ),
+        "prompt_template": ("Watch this video and provide a summary in {language}.\n"),
     },
     "notifications": [
         {

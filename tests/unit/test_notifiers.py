@@ -42,6 +42,7 @@ class TestBaseNotifierInterface:
 
     def test_name_property(self):
         """Exposes the notifier name passed at construction."""
+
         class ConcreteNotifier(BaseNotifier):
             async def send_summary(self, video: VideoInfo) -> bool:
                 return True
@@ -54,6 +55,7 @@ class TestBaseNotifierInterface:
 
     def test_format_message_substitutes_all_fields(self):
         """Substitutes all template variables in the message."""
+
         class ConcreteNotifier(BaseNotifier):
             async def send_summary(self, video: VideoInfo) -> bool:
                 return True
@@ -124,6 +126,7 @@ class TestSlackSendSummary:
 
     async def test_network_error_returns_false(self):
         """Returns False on network connection failure."""
+
         def raise_error(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("Connection refused")
 
@@ -175,6 +178,7 @@ class TestSlackSendError:
 
     async def test_network_error_returns_false(self):
         """Returns False on network connection failure."""
+
         def raise_error(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("Connection refused")
 
