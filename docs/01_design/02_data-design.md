@@ -102,7 +102,7 @@ Tracks which videos have been notified to prevent duplicates. Retains the last 5
 - Sort key `video_id` enables efficient lookups and batch writes.
 - `notified_at` is used to determine oldest entries for cleanup (delete oldest when count exceeds 500).
 
-## <stack-name>-secrets (Secrets Manager)
+## `<stack-name>-secrets` (Secrets Manager)
 
 Single JSON object containing all secrets. The secret name is `<stack-name>-secrets`, created by SAM.
 
