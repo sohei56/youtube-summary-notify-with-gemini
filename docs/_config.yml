@@ -9,4 +9,3 @@ exclude:
   - 01_design
   - 02_operation
   - 03_external_apis
-  - 99_images
