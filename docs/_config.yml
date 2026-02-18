@@ -1,0 +1,12 @@
+title: YouTube Summary Notify
+description: Automatically detect new YouTube videos, summarize them with Gemini AI, and send notifications to Slack or Discord.
+theme: jekyll-theme-cayman
+url: https://sohei56.github.io
+baseurl: /youtube-summary-notify-with-gemini
+
+exclude:
+  - 00_requirement
+  - 01_design
+  - 02_operation
+  - 03_external_apis
+  - 99_images
