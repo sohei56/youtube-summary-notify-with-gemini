@@ -1,4 +1,6 @@
 # YouTube Summary Notify
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
 
 Automatically detects new videos from specified YouTube channels, generates summaries using Gemini AI, and sends notifications to configured destinations (Slack, Discord).
 
@@ -10,7 +12,10 @@ Automatically detects new videos from specified YouTube channels, generates summ
 
 The system runs as a scheduled AWS Lambda function. All user-editable settings (channels, prompts, templates, model) live in a single S3 config file — no redeployment needed for configuration changes.
 
-## Architecture
+### Example Notifications
+![notification example](docs/99_images/notification-example.png)
+
+### Architecture
 
 ```
 ┌──────────────────────────────────────────────┐
