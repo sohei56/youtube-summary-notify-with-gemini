@@ -14,7 +14,7 @@ YouTube Summary Notify automatically detects new videos from your favorite YouTu
 
 ## Example Notifications
 
-![notification example](docs/99_images/notification-example.png)
+![notification example](99_images/notification-example.png)
 
 ## How It Works
 
