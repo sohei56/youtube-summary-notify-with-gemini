@@ -40,6 +40,24 @@ The system runs as a scheduled AWS Lambda function. All user-editable settings (
 
 For detailed architecture and design decisions, see [docs/01_design/](docs/01_design/).
 
+## Cost Estimate
+
+This system is designed to run at minimal cost. The table below assumes **5 channels, hourly checks (default), ~30 new videos/month**.
+
+| Service | Monthly Cost | Notes |
+|---|---|---|
+| **AWS Lambda** | ~$0 | 720 invocations × ~30s × 256 MB ≈ 5,400 GB-s/month. Well within the [free tier](https://aws.amazon.com/lambda/pricing/) (400,000 GB-s). |
+| **EventBridge** | $0 | 720 events/month. Free tier covers 14M events. |
+| **S3** | ~$0 | Single config file (~1 KB). Negligible. |
+| **DynamoDB** | ~$0 | On-demand mode with ~30–60 writes/month. Well within always-free 25 WCU/RCU. |
+| **Secrets Manager** | **~$0.40** | $0.40/secret/month. **Not included in the AWS Free Tier.** |
+| **YouTube Data API** | $0 | `playlistItems.list` = 1 unit/request. 120 units/day for 5 channels — free quota is 10,000 units/day. |
+| **Gemini API** | $0 – ~$1.50 | Gemini 2.5 Flash free tier is generous for light usage. On paid tier, ~$0.02–0.05/video depending on length. |
+
+**Estimated total: ~$0.50–$2/month**
+
+> After the 12-month AWS Free Tier period, Lambda/S3/DynamoDB costs increase slightly but remain well under $1/month at this scale. Secrets Manager ($0.40/month) is the only cost from day one.
+
 ## Quick Start
 
 ### Prerequisites

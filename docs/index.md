@@ -45,6 +45,22 @@ YouTube Summary Notify automatically detects new videos from your favorite YouTu
             Data API                    Webhooks
 ```
 
+## Cost Estimate
+
+Designed to run at minimal cost. Assumes **5 channels, hourly checks, ~30 new videos/month**.
+
+| Service | Monthly Cost | Notes |
+|---|---|---|
+| **AWS Lambda** | ~$0 | Well within the free tier (400,000 GB-s/month). |
+| **EventBridge** | $0 | 720 events/month. Free tier covers 14M. |
+| **S3** | ~$0 | Single config file (~1 KB). |
+| **DynamoDB** | ~$0 | On-demand, ~30–60 writes/month. |
+| **Secrets Manager** | **~$0.40** | Not included in the AWS Free Tier. |
+| **YouTube Data API** | $0 | 120 units/day — free quota is 10,000 units/day. |
+| **Gemini API** | $0 – ~$1.50 | Free tier covers light usage. Paid: ~$0.02–0.05/video. |
+
+**Estimated total: ~$0.50–$2/month**
+
 ## Quick Start
 
 ```bash
