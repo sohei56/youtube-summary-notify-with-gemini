@@ -22,7 +22,7 @@ channels:
 # Summarization settings.
 summarization:
   model: "gemini-2.5-flash"
-  language: "en"
+  language: "english"
   prompt_template: |
     Watch this video and respond in {language}.
 

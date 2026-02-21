@@ -46,6 +46,7 @@ YouTube Summary Notify automatically detects new videos from your favorite YouTu
 ```
 
 ## Cost Estimate
+(This information is current as of 2026-02-21.)
 
 Designed to run at minimal cost. Assumes **5 channels, hourly checks, ~30 new videos/month**.
 

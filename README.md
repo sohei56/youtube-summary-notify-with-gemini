@@ -41,6 +41,7 @@ The system runs as a scheduled AWS Lambda function. All user-editable settings (
 For detailed architecture and design decisions, see [docs/01_design/](docs/01_design/).
 
 ## Cost Estimate
+(This information is current as of 2026-02-21.)
 
 This system is designed to run at minimal cost. The table below assumes **5 channels, hourly checks (default), ~30 new videos/month**.
 
@@ -55,8 +56,6 @@ This system is designed to run at minimal cost. The table below assumes **5 chan
 | **Gemini API** | $0 – ~$1.50 | Gemini 2.5 Flash free tier is generous for light usage. On paid tier, ~$0.02–0.05/video depending on length. |
 
 **Estimated total: ~$0.50–$2/month**
-
-> After the 12-month AWS Free Tier period, Lambda/S3/DynamoDB costs increase slightly but remain well under $1/month at this scale. Secrets Manager ($0.40/month) is the only cost from day one.
 
 ## Quick Start
 
