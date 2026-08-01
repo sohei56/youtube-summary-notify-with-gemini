@@ -83,6 +83,7 @@ class VideoInfo:
     published_at: str
     summary: str
 
+
 class BaseNotifier(ABC):
     @abstractmethod
     async def send_summary(self, video: VideoInfo) -> bool:
